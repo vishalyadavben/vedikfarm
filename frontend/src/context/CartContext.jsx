@@ -1,0 +1,41 @@
+import { createContext, useContext, useState, useCallback } from 'react';
+import client from '../api/client';
+import { useAuth } from './AuthContext';
+
+const CartContext = createContext(null);
+
+export function CartProvider({ children }) {
+  const { user } = useAuth();
+  const [cart, setCart] = useState({ items: [], subtotal: 0 });
+
+  const refreshCart = useCallback(async () => {
+    if (!user) {
+      setCart({ items: [], subtotal: 0 });
+      return;
+    }
+    const res = await client.get('/api/cart');
+    setCart(res.data);
+  }, [user]);
+
+  async function addToCart(productId, quantity = 1) {
+    const res = await client.post('/api/cart/items', { productId, quantity });
+    setCart(res.data);
+  }
+
+  async function updateCartItem(cartItemId, quantity) {
+    const res = await client.patch(`/api/cart/items/${cartItemId}`, { quantity });
+    setCart(res.data);
+  }
+
+  const itemCount = cart.items.reduce((sum, i) => sum + i.quantity, 0);
+
+  return (
+    <CartContext.Provider value={{ cart, refreshCart, addToCart, updateCartItem, itemCount }}>
+      {children}
+    </CartContext.Provider>
+  );
+}
+
+export function useCart() {
+  return useContext(CartContext);
+}

@@ -1,0 +1,18 @@
+package com.vedikfarm.api.common;
+
+import java.text.Normalizer;
+import java.util.regex.Pattern;
+
+public class SlugUtil {
+    private static final Pattern NONLATIN = Pattern.compile("[^\\w-]");
+    private static final Pattern WHITESPACE = Pattern.compile("[\\s]+");
+
+    private SlugUtil() {}
+
+    public static String slugify(String input) {
+        String noWhitespace = WHITESPACE.matcher(input.trim()).replaceAll("-");
+        String normalized = Normalizer.normalize(noWhitespace, Normalizer.Form.NFD);
+        String slug = NONLATIN.matcher(normalized).replaceAll("");
+        return slug.toLowerCase().replaceAll("-+", "-");
+    }
+}

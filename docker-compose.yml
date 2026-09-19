@@ -1,0 +1,63 @@
+services:
+  mysql:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_NAME:-vedikfarm}
+      MYSQL_USER: ${DB_USER:-vedikfarm}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-vedikfarm}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-change_me}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      # Host port 3309 - both 3306 and 3307 are already taken by your other project's
+      # MySQL container. This only affects connecting a DB client from your own
+      # machine; the backend container always talks to mysql:3306 internally over
+      # the Docker network, unaffected by this mapping.
+      - "3309:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-change_me}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ./backend
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: ${DB_NAME:-vedikfarm}
+      DB_USER: ${DB_USER:-vedikfarm}
+      DB_PASSWORD: ${DB_PASSWORD:-vedikfarm}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_ACCESS_EXPIRY_MIN: ${JWT_ACCESS_EXPIRY_MIN:-60}
+      JWT_REFRESH_EXPIRY_DAYS: ${JWT_REFRESH_EXPIRY_DAYS:-30}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:5174}
+      RAZORPAY_KEY_ID: ${RAZORPAY_KEY_ID}
+      RAZORPAY_KEY_SECRET: ${RAZORPAY_KEY_SECRET}
+      RAZORPAY_WEBHOOK_SECRET: ${RAZORPAY_WEBHOOK_SECRET}
+      R2_ENDPOINT: ${R2_ENDPOINT}
+      R2_ACCESS_KEY: ${R2_ACCESS_KEY}
+      R2_SECRET_KEY: ${R2_SECRET_KEY}
+      R2_BUCKET: ${R2_BUCKET:-vedikfarm-product-images}
+      R2_PUBLIC_BASE_URL: ${R2_PUBLIC_BASE_URL}
+      SELLER_STATE: ${SELLER_STATE:-Maharashtra}
+      SHIPPING_FREE_ABOVE: ${SHIPPING_FREE_ABOVE:-999.00}
+      SHIPPING_FLAT_FEE: ${SHIPPING_FLAT_FEE:-49.00}
+      SMTP_HOST: ${SMTP_HOST:-smtp.gmail.com}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+    ports:
+      # Host port 8090, not 8080 - your other project's backend already uses 8080
+      # on your machine. Container-internal port stays 8080 (see Dockerfile/EXPOSE);
+      # this only changes what you type in your browser/frontend .env to reach it.
+      - "8090:8080"
+
+volumes:
+  mysql_data:

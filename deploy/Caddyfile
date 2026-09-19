@@ -1,0 +1,10 @@
+# Caddy reverse proxy for the backend API, with automatic HTTPS (Let's Encrypt).
+# Install Caddy directly on the VPS (not in Docker) so it can bind ports 80/443
+# and manage certs on the host - see deploy/VPS_SETUP.md.
+#
+# Point api.vedikfarm.in's DNS A record at this VPS's IP before starting Caddy,
+# or certificate issuance will fail.
+
+api.vedikfarm.in {
+    reverse_proxy localhost:8080
+}

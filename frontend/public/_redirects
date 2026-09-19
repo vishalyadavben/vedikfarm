@@ -1,0 +1,3 @@
+# Cloudflare Pages: serve index.html for every route so React Router's client-side
+# routing works on a hard refresh/direct link (e.g. /shop, /orders/VF260906-1234).
+/*    /index.html   200
