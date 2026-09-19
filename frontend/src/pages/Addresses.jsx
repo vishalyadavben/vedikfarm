@@ -7,6 +7,7 @@ export default function Addresses() {
   const [addresses, setAddresses] = useState([]);
   const [form, setForm] = useState(emptyForm);
   const [error, setError] = useState('');
+  const [editingId, setEditingId] = useState(null);
 
   function load() {
     client.get('/api/addresses').then((res) => setAddresses(res.data));
@@ -18,12 +19,40 @@ export default function Addresses() {
     setForm((f) => ({ ...f, [field]: value }));
   }
 
+  function startEdit(a) {
+    setEditingId(a.id);
+    setError('');
+    setForm({
+      label: a.label || '',
+      recipientName: a.recipientName || '',
+      line1: a.line1 || '',
+      line2: a.line2 || '',
+      city: a.city || '',
+      state: a.state || '',
+      pincode: a.pincode || '',
+      phone: a.phone || '',
+      isDefault: !!a.isDefault,
+    });
+    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+  }
+
+  function cancelEdit() {
+    setEditingId(null);
+    setForm(emptyForm);
+    setError('');
+  }
+
   async function handleSubmit(e) {
     e.preventDefault();
     setError('');
     try {
-      await client.post('/api/addresses', form);
+      if (editingId) {
+        await client.put(`/api/addresses/${editingId}`, form);
+      } else {
+        await client.post('/api/addresses', form);
+      }
       setForm(emptyForm);
+      setEditingId(null);
       load();
     } catch (err) {
       setError(err.message);
@@ -32,6 +61,7 @@ export default function Addresses() {
 
   async function remove(id) {
     await client.delete(`/api/addresses/${id}`);
+    if (editingId === id) cancelEdit();
     load();
   }
 
@@ -44,13 +74,16 @@ export default function Addresses() {
             <strong>{a.recipientName}</strong>{a.isDefault ? ' (default)' : ''}<br />
             {a.line1}{a.line2 ? `, ${a.line2}` : ''}, {a.city}, {a.state} {a.pincode}<br />
             Phone: {a.phone}
-            <button className="link-button" onClick={() => remove(a.id)}>Remove</button>
+            <div className="address-actions">
+              <button className="link-button" onClick={() => startEdit(a)}>Edit</button>
+              <button className="link-button" onClick={() => remove(a.id)}>Remove</button>
+            </div>
           </li>
         ))}
         {addresses.length === 0 && <p>No saved addresses yet.</p>}
       </ul>
 
-      <h2>Add Address</h2>
+      <h2>{editingId ? 'Edit Address' : 'Add Address'}</h2>
       <form onSubmit={handleSubmit} className="address-form">
         <label>Label (e.g. Home)<input value={form.label} onChange={(e) => update('label', e.target.value)} /></label>
         <label>Recipient Name<input value={form.recipientName} onChange={(e) => update('recipientName', e.target.value)} required /></label>
@@ -62,7 +95,10 @@ export default function Addresses() {
         <label>Phone<input value={form.phone} onChange={(e) => update('phone', e.target.value)} required /></label>
         <label className="checkbox-label"><input type="checkbox" checked={form.isDefault} onChange={(e) => update('isDefault', e.target.checked)} /> Set as default</label>
         {error && <p className="error-text">{error}</p>}
-        <button className="btn btn-primary" type="submit">Save Address</button>
+        <div className="address-form-actions">
+          <button className="btn btn-primary" type="submit">{editingId ? 'Save Changes' : 'Save Address'}</button>
+          {editingId && <button type="button" className="btn btn-secondary" onClick={cancelEdit}>Cancel</button>}
+        </div>
       </form>
     </div>
   );

@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback } from 'react';
+import { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import client from '../api/client';
 import { useAuth } from './AuthContext';
 import { useToast } from './ToastContext';
@@ -18,6 +18,13 @@ export function CartProvider({ children }) {
     const res = await client.get('/api/cart');
     setCart(res.data);
   }, [user]);
+
+  // Keep the header cart badge in sync with the actual logged-in user: this fires on every
+  // login/logout transition (not just when a page happens to call refreshCart itself), which
+  // fixes the badge staying stale after logout and not appearing until the Cart page was visited.
+  useEffect(() => {
+    refreshCart();
+  }, [refreshCart]);
 
   async function addToCart(productId, quantity = 1) {
     try {

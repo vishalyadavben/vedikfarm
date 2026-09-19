@@ -200,7 +200,7 @@ export default function ProductDetail() {
       </section>
 
       {related.length > 0 && (
-        <section>
+        <section className="related-products-section">
           <h2 className="section-heading">You Might Also Like</h2>
           <div className="product-grid">
             {related.map((p) => (
