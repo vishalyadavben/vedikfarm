@@ -173,9 +173,17 @@ a { color: var(--color-primary-dark); }
   text-decoration: none;
   color: var(--color-text);
   background: #fff;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+.showcase-card:hover, .showcase-card:focus-visible {
+  border-color: var(--color-primary);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  transform: translateY(-3px);
 }
 .showcase-card h3 { margin: 0 0 0.5rem; }
 .showcase-card .promo-link { color: var(--color-primary-dark); }
+.showcase-card:hover .promo-link, .showcase-card:focus-visible .promo-link { transform: translateX(4px); }
 .faq-list { display: flex; flex-direction: column; gap: 0.75rem; max-width: 760px; }
 .faq-item { border: 1px solid var(--color-border); border-radius: 8px; padding: 0.85rem 1rem; background: #fff; }
 .faq-item summary { cursor: pointer; font-weight: 600; }
