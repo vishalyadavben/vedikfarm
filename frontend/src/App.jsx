@@ -1,6 +1,7 @@
 import { Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
+import BackToTop from './components/BackToTop';
 import { ProtectedRoute, AdminRoute } from './components/ProtectedRoute';
 
 import Home from './pages/Home';
@@ -50,6 +51,7 @@ export default function App() {
         </Routes>
       </main>
       <Footer />
+      <BackToTop />
     </div>
   );
 }
