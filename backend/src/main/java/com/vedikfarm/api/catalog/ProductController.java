@@ -30,18 +30,24 @@ public class ProductController {
     @GetMapping("/api/products")
     public ApiResponse<Page<ProductResponse>> listProducts(
             @RequestParam(required = false) String category,
+            @RequestParam(required = false) String search,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
 
         Pageable pageable = PageRequest.of(page, Math.min(size, 100), Sort.by("name").ascending());
+        String query = (search != null && !search.isBlank()) ? search.trim() : null;
 
         Page<Product> products;
         if (category != null && !category.isBlank()) {
             Category cat = categoryRepository.findBySlug(category)
                     .orElseThrow(() -> ApiException.notFound("Category not found"));
-            products = productRepository.findByActiveTrueAndCategoryId(cat.getId(), pageable);
+            products = (query != null)
+                    ? productRepository.findByActiveTrueAndCategoryIdAndNameContainingIgnoreCase(cat.getId(), query, pageable)
+                    : productRepository.findByActiveTrueAndCategoryId(cat.getId(), pageable);
         } else {
-            products = productRepository.findByActiveTrue(pageable);
+            products = (query != null)
+                    ? productRepository.findByActiveTrueAndNameContainingIgnoreCase(query, pageable)
+                    : productRepository.findByActiveTrue(pageable);
         }
 
         return ApiResponse.ok(products.map(ProductResponse::from));

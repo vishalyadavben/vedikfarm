@@ -11,6 +11,8 @@ export default function Shop() {
   const [error, setError] = useState('');
   const [searchParams, setSearchParams] = useSearchParams();
   const category = searchParams.get('category') || '';
+  const search = searchParams.get('search') || '';
+  const [searchInput, setSearchInput] = useState(search);
   const { addToCart } = useCart();
   const { user } = useAuth();
 
@@ -18,53 +20,102 @@ export default function Shop() {
     client.get('/api/categories').then((res) => setCategories(res.data)).catch(() => {});
   }, []);
 
+  // Keep the input box in sync if the URL changes from elsewhere (e.g. back button).
+  useEffect(() => {
+    setSearchInput(search);
+  }, [search]);
+
+  // Debounce typing before it becomes a URL param / API call.
+  useEffect(() => {
+    const handle = setTimeout(() => {
+      if (searchInput !== search) {
+        const next = {};
+        if (category) next.category = category;
+        if (searchInput) next.search = searchInput;
+        setSearchParams(next);
+      }
+    }, 350);
+    return () => clearTimeout(handle);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchInput]);
+
   useEffect(() => {
     setLoading(true);
-    const params = category ? { category } : {};
+    const params = {};
+    if (category) params.category = category;
+    if (search) params.search = search;
     client.get('/api/products', { params })
       .then((res) => setProducts(res.data.content))
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
-  }, [category]);
+  }, [category, search]);
 
-  if (loading) return <p>Loading products...</p>;
-  if (error) return <p className="error-text">{error}</p>;
+  function selectCategory(slug) {
+    const next = {};
+    if (slug) next.category = slug;
+    if (search) next.search = search;
+    setSearchParams(next);
+  }
 
   return (
     <div>
       <h1>Shop</h1>
-      <div className="category-filters">
-        <button className={!category ? 'active' : ''} onClick={() => setSearchParams({})}>All</button>
-        {categories.map((c) => (
-          <button key={c.id} className={category === c.slug ? 'active' : ''} onClick={() => setSearchParams({ category: c.slug })}>
-            {c.name}
-          </button>
-        ))}
+
+      <div className="shop-toolbar">
+        <input
+          type="search"
+          className="search-input"
+          placeholder="Search products (e.g. ghee, chia seeds)..."
+          value={searchInput}
+          onChange={(e) => setSearchInput(e.target.value)}
+          aria-label="Search products"
+        />
+        <div className="category-filters">
+          <button className={!category ? 'active' : ''} onClick={() => selectCategory('')}>All</button>
+          {categories.map((c) => (
+            <button key={c.id} className={category === c.slug ? 'active' : ''} onClick={() => selectCategory(c.slug)}>
+              {c.name}
+            </button>
+          ))}
+        </div>
       </div>
 
-      <div className="product-grid">
-        {products.map((p) => (
-          <div className="product-card" key={p.id}>
-            <Link to={`/products/${p.slug}`}>
-              {p.imageUrl ? <img src={p.imageUrl} alt={p.name} /> : <div className="image-placeholder" />}
-              <h3>{p.name}</h3>
-              <p className="unit-label">{p.unitLabel}</p>
-              <p className="price">Rs.{p.price}</p>
-            </Link>
-            {p.stockQty > 0 ? (
-              <button
-                className="btn btn-secondary"
-                onClick={() => (user ? addToCart(p.id, 1) : (window.location.href = '/login'))}
-              >
-                Add to Cart
-              </button>
-            ) : (
-              <p className="out-of-stock">Out of stock</p>
-            )}
-          </div>
-        ))}
-        {products.length === 0 && <p>No products found.</p>}
-      </div>
+      {loading ? (
+        <p>Loading products...</p>
+      ) : error ? (
+        <p className="error-text">{error}</p>
+      ) : (
+        <div className="product-grid">
+          {products.map((p) => (
+            <div className="product-card" key={p.id}>
+              <Link to={`/products/${p.slug}`}>
+                {p.imageUrl ? <img src={p.imageUrl} alt={p.name} /> : <div className="image-placeholder" />}
+                <h3>{p.name}</h3>
+                <p className="unit-label">{p.unitLabel}</p>
+                <p className="price">Rs.{p.price}</p>
+              </Link>
+              {p.stockQty > 0 ? (
+                <button
+                  className="btn btn-secondary"
+                  onClick={() => (user ? addToCart(p.id, 1) : (window.location.href = '/login'))}
+                >
+                  Add to Cart
+                </button>
+              ) : (
+                <p className="out-of-stock">Out of stock</p>
+              )}
+            </div>
+          ))}
+          {products.length === 0 && (
+            <p>
+              No products found{search ? ` for "${search}"` : ''}.
+              {search && (
+                <> {' '}<button className="link-button" onClick={() => setSearchInput('')}>Clear search</button></>
+              )}
+            </p>
+          )}
+        </div>
+      )}
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
+import logoHeader from '../assets/logo-header.png';
 
 export default function Header() {
   const { user, logout, isAdmin } = useAuth();
@@ -9,7 +10,9 @@ export default function Header() {
   return (
     <header className="site-header">
       <div className="container header-inner">
-        <Link to="/" className="brand">Vedik Farm</Link>
+        <Link to="/" className="brand">
+          <img src={logoHeader} alt="Vedik Farms - Milk Beyond Nutrition" className="brand-logo" />
+        </Link>
         <nav className="main-nav">
           <Link to="/shop">Shop</Link>
           <Link to="/about">About</Link>
