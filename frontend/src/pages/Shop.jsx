@@ -3,6 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import client from '../api/client';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
+import StarRating from '../components/StarRating';
 
 export default function Shop() {
   const [products, setProducts] = useState([]);
@@ -91,6 +92,7 @@ export default function Shop() {
               <Link to={`/products/${p.slug}`}>
                 {p.imageUrl ? <img src={p.imageUrl} alt={p.name} /> : <div className="image-placeholder" />}
                 <h3>{p.name}</h3>
+                <StarRating avg={p.ratingAvg} count={p.ratingCount} />
                 <p className="unit-label">{p.unitLabel}</p>
                 <p className="price">Rs.{p.price}</p>
               </Link>

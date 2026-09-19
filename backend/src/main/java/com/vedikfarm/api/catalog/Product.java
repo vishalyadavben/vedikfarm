@@ -42,6 +42,12 @@ public class Product {
     @Column(name = "is_active", nullable = false)
     private boolean active = true;
 
+    @Column(name = "rating_avg", nullable = false, precision = 3, scale = 2)
+    private BigDecimal ratingAvg = BigDecimal.ZERO;
+
+    @Column(name = "rating_count", nullable = false)
+    private int ratingCount = 0;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
@@ -80,6 +86,12 @@ public class Product {
 
     public boolean isActive() { return active; }
     public void setActive(boolean active) { this.active = active; }
+
+    public BigDecimal getRatingAvg() { return ratingAvg; }
+    public void setRatingAvg(BigDecimal ratingAvg) { this.ratingAvg = ratingAvg; }
+
+    public int getRatingCount() { return ratingCount; }
+    public void setRatingCount(int ratingCount) { this.ratingCount = ratingCount; }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }

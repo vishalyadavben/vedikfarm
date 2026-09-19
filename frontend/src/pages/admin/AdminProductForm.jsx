@@ -10,6 +10,8 @@ export default function AdminProductForm() {
   const [form, setForm] = useState(emptyForm);
   const [categories, setCategories] = useState([]);
   const [imageFile, setImageFile] = useState(null);
+  const [galleryImages, setGalleryImages] = useState([]);
+  const [newGalleryFiles, setNewGalleryFiles] = useState([]);
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
@@ -35,7 +37,12 @@ export default function AdminProductForm() {
         });
       }
     });
+    loadGallery(id);
   }, [id, isEdit]);
+
+  function loadGallery(productId) {
+    client.get(`/api/admin/products/${productId}/images`).then((res) => setGalleryImages(res.data)).catch(() => {});
+  }
 
   function update(field, value) {
     setForm((f) => ({ ...f, [field]: value }));
@@ -63,11 +70,35 @@ export default function AdminProductForm() {
         });
       }
 
-      navigate('/admin/products');
+      for (const file of newGalleryFiles) {
+        const formData = new FormData();
+        formData.append('file', file);
+        // eslint-disable-next-line no-await-in-loop
+        await client.post(`/api/admin/products/${productId}/images`, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
+      }
+
+      if (!isEdit && newGalleryFiles.length > 0) {
+        // Stay on the form after creating so the admin can see/manage the gallery they just uploaded.
+        navigate(`/admin/products/${productId}/edit`);
+      } else {
+        navigate('/admin/products');
+      }
     } catch (err) {
       setError(err.message);
     } finally {
       setSubmitting(false);
+    }
+  }
+
+  async function handleDeleteGalleryImage(imageId) {
+    if (!isEdit) return;
+    try {
+      const res = await client.delete(`/api/admin/products/${id}/images/${imageId}`);
+      setGalleryImages(res.data);
+    } catch (err) {
+      setError(err.message);
     }
   }
 
@@ -91,7 +122,29 @@ export default function AdminProductForm() {
           GST Rate (%) - confirm the correct rate for this product with an accountant
           <input type="number" step="0.01" min="0" value={form.gstRate} onChange={(e) => update('gstRate', e.target.value)} required />
         </label>
-        <label>Product Image<input type="file" accept="image/*" onChange={(e) => setImageFile(e.target.files[0])} /></label>
+        <label>Main / Cover Image<input type="file" accept="image/*" onChange={(e) => setImageFile(e.target.files[0])} /></label>
+
+        <label>
+          Additional Gallery Images (you can select more than one)
+          <input type="file" accept="image/*" multiple onChange={(e) => setNewGalleryFiles(Array.from(e.target.files))} />
+        </label>
+        <p className="hint-text">
+          {isEdit
+            ? 'New files are uploaded when you click Save Product below.'
+            : 'Save the product first, then more gallery images can be uploaded here too - files picked now will upload right after this product is created.'}
+        </p>
+
+        {galleryImages.length > 0 && (
+          <div className="admin-gallery">
+            {galleryImages.map((img) => (
+              <div className="admin-gallery-thumb" key={img.id}>
+                <img src={img.imageUrl} alt="" />
+                <button type="button" className="link-button" onClick={() => handleDeleteGalleryImage(img.id)}>Remove</button>
+              </div>
+            ))}
+          </div>
+        )}
+
         <label className="checkbox-label"><input type="checkbox" checked={form.active} onChange={(e) => update('active', e.target.checked)} /> Active (visible on storefront)</label>
         {error && <p className="error-text">{error}</p>}
         <button className="btn btn-primary" type="submit" disabled={submitting}>{submitting ? 'Saving...' : 'Save Product'}</button>

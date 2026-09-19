@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import client from '../api/client';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
+import StarRating from '../components/StarRating';
 
 const USPS = [
   { title: '100% A2 Gir Cow Milk', text: 'Sourced from indigenous Gir cows, never crossbred, never rushed.' },
@@ -72,6 +73,7 @@ export default function Home() {
                 <Link to={`/products/${p.slug}`}>
                   {p.imageUrl ? <img src={p.imageUrl} alt={p.name} /> : <div className="image-placeholder" />}
                   <h3>{p.name}</h3>
+                  <StarRating avg={p.ratingAvg} count={p.ratingCount} />
                   <p className="unit-label">{p.unitLabel}</p>
                   <p className="price">Rs.{p.price}</p>
                 </Link>
