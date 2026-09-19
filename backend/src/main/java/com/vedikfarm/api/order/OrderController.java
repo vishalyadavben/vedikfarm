@@ -4,6 +4,7 @@ import com.vedikfarm.api.auth.AuthenticatedUser;
 import com.vedikfarm.api.common.ApiResponse;
 import com.vedikfarm.api.order.dto.CreateOrderRequest;
 import com.vedikfarm.api.order.dto.OrderResponse;
+import com.vedikfarm.api.order.dto.QuoteResponse;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -25,6 +26,13 @@ public class OrderController {
     public ApiResponse<OrderResponse> createOrder(@AuthenticationPrincipal AuthenticatedUser user,
                                                    @Valid @RequestBody CreateOrderRequest request) {
         return ApiResponse.ok(orderService.createOrderFromCart(user.getUserId(), request));
+    }
+
+    /** Live GST/shipping/total preview for the checkout page - nothing is created or charged. */
+    @GetMapping("/quote")
+    public ApiResponse<QuoteResponse> previewOrder(@AuthenticationPrincipal AuthenticatedUser user,
+                                                    @RequestParam Long addressId) {
+        return ApiResponse.ok(orderService.previewOrder(user.getUserId(), addressId));
     }
 
     @GetMapping

@@ -1,11 +1,13 @@
 import { createContext, useContext, useState, useCallback } from 'react';
 import client from '../api/client';
 import { useAuth } from './AuthContext';
+import { useToast } from './ToastContext';
 
 const CartContext = createContext(null);
 
 export function CartProvider({ children }) {
   const { user } = useAuth();
+  const toast = useToast();
   const [cart, setCart] = useState({ items: [], subtotal: 0 });
 
   const refreshCart = useCallback(async () => {
@@ -18,8 +20,14 @@ export function CartProvider({ children }) {
   }, [user]);
 
   async function addToCart(productId, quantity = 1) {
-    const res = await client.post('/api/cart/items', { productId, quantity });
-    setCart(res.data);
+    try {
+      const res = await client.post('/api/cart/items', { productId, quantity });
+      setCart(res.data);
+      toast?.showToast('Added to cart', 'success');
+    } catch (err) {
+      toast?.showToast(err.message || 'Could not add to cart. Please try again.', 'error');
+      throw err;
+    }
   }
 
   async function updateCartItem(cartItemId, quantity) {

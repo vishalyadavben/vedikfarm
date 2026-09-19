@@ -10,6 +10,7 @@ import com.vedikfarm.api.config.ShippingProperties;
 import com.vedikfarm.api.notification.OrderMailService;
 import com.vedikfarm.api.order.dto.CreateOrderRequest;
 import com.vedikfarm.api.order.dto.OrderResponse;
+import com.vedikfarm.api.order.dto.QuoteResponse;
 import com.vedikfarm.api.payment.RazorpayService;
 import com.vedikfarm.api.user.Address;
 import com.vedikfarm.api.user.AddressRepository;
@@ -22,6 +23,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -57,6 +59,34 @@ public class OrderService {
     }
 
     /**
+     * Side-effect-free preview of the current cart's GST + shipping + total for a given
+     * shipping address, so the checkout page can show the real total before "Pay Now" is
+     * clicked - nothing is persisted and no Razorpay order is created here.
+     */
+    public QuoteResponse previewOrder(Long userId, Long addressId) {
+        CartQuote quote = computeQuote(userId, addressId);
+
+        QuoteResponse r = new QuoteResponse();
+        r.subtotal = quote.subtotal();
+        r.cgstAmount = quote.cgst();
+        r.sgstAmount = quote.sgst();
+        r.igstAmount = quote.igst();
+        r.shippingFee = quote.shippingFee();
+        r.total = quote.total();
+        r.items = quote.lines().stream().map(l -> {
+            QuoteResponse.Item i = new QuoteResponse.Item();
+            i.productName = l.productName();
+            i.unitLabel = l.unitLabel();
+            i.quantity = l.quantity();
+            i.lineSubtotal = l.lineSubtotal();
+            i.lineGst = l.lineGst();
+            i.lineTotal = l.lineTotal();
+            return i;
+        }).toList();
+        return r;
+    }
+
+    /**
      * Creates a PENDING_PAYMENT order snapshotting the current cart + a Razorpay order to pay it.
      * Stock is validated here but NOT decremented yet - it's only decremented once payment is
      * confirmed (by the client callback or, authoritatively, the webhook), so an abandoned
@@ -64,12 +94,64 @@ public class OrderService {
      */
     @Transactional
     public OrderResponse createOrderFromCart(Long userId, CreateOrderRequest request) {
+        CartQuote quote = computeQuote(userId, request.getAddressId());
+        Address address = quote.address();
+
+        Order order = new Order();
+        order.setOrderNumber(generateOrderNumber());
+        order.setUserId(userId);
+        order.setStatus(OrderStatus.PENDING_PAYMENT);
+        order.setSubtotal(quote.subtotal());
+        order.setCgstAmount(quote.cgst());
+        order.setSgstAmount(quote.sgst());
+        order.setIgstAmount(quote.igst());
+        order.setShippingFee(quote.shippingFee());
+        order.setTotal(quote.total());
+        order.setBuyerGstin(request.getBuyerGstin());
+        order.setShipName(address.getRecipientName());
+        order.setShipPhone(address.getPhone());
+        order.setShipLine1(address.getLine1());
+        order.setShipLine2(address.getLine2());
+        order.setShipCity(address.getCity());
+        order.setShipState(address.getState());
+        order.setShipPincode(address.getPincode());
+        order = orderRepository.save(order);
+
+        List<OrderItem> orderItems = new ArrayList<>();
+        for (LineCalc l : quote.lines()) {
+            OrderItem oi = new OrderItem();
+            oi.setOrderId(order.getId());
+            oi.setProductId(l.productId());
+            oi.setProductName(l.productName());
+            oi.setUnitLabel(l.unitLabel());
+            oi.setUnitPrice(l.unitPrice());
+            oi.setGstRate(l.gstRate());
+            oi.setQuantity(l.quantity());
+            oi.setLineSubtotal(l.lineSubtotal());
+            oi.setLineGst(l.lineGst());
+            oi.setLineTotal(l.lineTotal());
+            orderItems.add(oi);
+        }
+        orderItemRepository.saveAll(orderItems);
+
+        String razorpayOrderId = razorpayService.createOrder(order.getOrderNumber(), quote.total());
+        order.setRazorpayOrderId(razorpayOrderId);
+        order = orderRepository.save(order);
+
+        OrderResponse response = OrderResponse.from(order, orderItems);
+        response.razorpayOrderId = razorpayOrderId;
+        response.razorpayKeyId = razorpayService.getKeyId();
+        return response;
+    }
+
+    /** Shared GST/shipping calculation used by both the live preview and the real order creation. */
+    private CartQuote computeQuote(Long userId, Long addressId) {
         List<CartItem> cartItems = cartItemRepository.findByUserId(userId);
         if (cartItems.isEmpty()) {
             throw ApiException.badRequest("Your cart is empty.");
         }
 
-        Address address = addressRepository.findById(request.getAddressId())
+        Address address = addressRepository.findById(addressId)
                 .filter(a -> a.getUserId().equals(userId))
                 .orElseThrow(() -> ApiException.notFound("Address not found"));
 
@@ -79,7 +161,7 @@ public class OrderService {
 
         BigDecimal subtotal = BigDecimal.ZERO;
         BigDecimal totalGst = BigDecimal.ZERO;
-        List<OrderItem> orderItems = new java.util.ArrayList<>();
+        List<LineCalc> lines = new ArrayList<>();
 
         for (CartItem ci : cartItems) {
             Product product = productsById.get(ci.getProductId());
@@ -99,17 +181,8 @@ public class OrderService {
             subtotal = subtotal.add(lineSubtotal);
             totalGst = totalGst.add(lineGst);
 
-            OrderItem oi = new OrderItem();
-            oi.setProductId(product.getId());
-            oi.setProductName(product.getName());
-            oi.setUnitLabel(product.getUnitLabel());
-            oi.setUnitPrice(product.getPrice());
-            oi.setGstRate(product.getGstRate());
-            oi.setQuantity(ci.getQuantity());
-            oi.setLineSubtotal(lineSubtotal);
-            oi.setLineGst(lineGst);
-            oi.setLineTotal(lineTotal);
-            orderItems.add(oi);
+            lines.add(new LineCalc(product.getId(), product.getName(), product.getUnitLabel(),
+                    product.getPrice(), product.getGstRate(), ci.getQuantity(), lineSubtotal, lineGst, lineTotal));
         }
 
         boolean sameState = address.getState() != null
@@ -129,39 +202,7 @@ public class OrderService {
 
         BigDecimal total = subtotal.add(cgst).add(sgst).add(igst).add(shippingFee);
 
-        Order order = new Order();
-        order.setOrderNumber(generateOrderNumber());
-        order.setUserId(userId);
-        order.setStatus(OrderStatus.PENDING_PAYMENT);
-        order.setSubtotal(subtotal);
-        order.setCgstAmount(cgst);
-        order.setSgstAmount(sgst);
-        order.setIgstAmount(igst);
-        order.setShippingFee(shippingFee);
-        order.setTotal(total);
-        order.setBuyerGstin(request.getBuyerGstin());
-        order.setShipName(address.getRecipientName());
-        order.setShipPhone(address.getPhone());
-        order.setShipLine1(address.getLine1());
-        order.setShipLine2(address.getLine2());
-        order.setShipCity(address.getCity());
-        order.setShipState(address.getState());
-        order.setShipPincode(address.getPincode());
-        order = orderRepository.save(order);
-
-        for (OrderItem oi : orderItems) {
-            oi.setOrderId(order.getId());
-        }
-        orderItemRepository.saveAll(orderItems);
-
-        String razorpayOrderId = razorpayService.createOrder(order.getOrderNumber(), total);
-        order.setRazorpayOrderId(razorpayOrderId);
-        order = orderRepository.save(order);
-
-        OrderResponse response = OrderResponse.from(order, orderItems);
-        response.razorpayOrderId = razorpayOrderId;
-        response.razorpayKeyId = razorpayService.getKeyId();
-        return response;
+        return new CartQuote(address, subtotal, cgst, sgst, igst, shippingFee, total, lines);
     }
 
     /**
@@ -214,5 +255,16 @@ public class OrderService {
             candidate = prefix + String.format("%04d", random.nextInt(10000));
         } while (orderRepository.existsByOrderNumber(candidate));
         return candidate;
+    }
+
+    /** One cart line's computed amounts - shared shape between the preview and the real order. */
+    private record LineCalc(Long productId, String productName, String unitLabel, BigDecimal unitPrice,
+                             BigDecimal gstRate, int quantity, BigDecimal lineSubtotal, BigDecimal lineGst,
+                             BigDecimal lineTotal) {
+    }
+
+    /** The full computed quote for a cart + address - shared between preview and real order creation. */
+    private record CartQuote(Address address, BigDecimal subtotal, BigDecimal cgst, BigDecimal sgst,
+                              BigDecimal igst, BigDecimal shippingFee, BigDecimal total, List<LineCalc> lines) {
     }
 }

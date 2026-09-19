@@ -1,5 +1,6 @@
 package com.vedikfarm.api.user.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 
 public class AddressRequest {
@@ -29,6 +30,12 @@ public class AddressRequest {
     public void setPincode(String pincode) { this.pincode = pincode; }
     public String getPhone() { return phone; }
     public void setPhone(String phone) { this.phone = phone; }
+    // Without this, Jackson expects JSON key "default" (from the isXxx()/setXxx() naming
+    // convention) instead of "isDefault", so the "Set as default" checkbox the frontend sends
+    // as `{ isDefault: true }` was silently dropped as an unrecognized property.
+    @JsonProperty("isDefault")
     public boolean isDefault() { return isDefault; }
+
+    @JsonProperty("isDefault")
     public void setDefault(boolean aDefault) { isDefault = aDefault; }
 }

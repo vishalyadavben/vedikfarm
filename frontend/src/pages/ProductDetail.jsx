@@ -12,7 +12,6 @@ export default function ProductDetail() {
   const [category, setCategory] = useState(null);
   const [related, setRelated] = useState([]);
   const [quantity, setQuantity] = useState(1);
-  const [message, setMessage] = useState('');
   const [activeImage, setActiveImage] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [reviewForm, setReviewForm] = useState({ rating: 5, comment: '' });
@@ -25,7 +24,6 @@ export default function ProductDetail() {
   useEffect(() => {
     setProduct(null);
     setNotFound(false);
-    setMessage('');
     setQuantity(1);
     setReviewSubmitted(false);
     setReviewForm({ rating: 5, comment: '' });
@@ -70,9 +68,8 @@ export default function ProductDetail() {
     }
     try {
       await addToCart(product.id, quantity);
-      setMessage('Added to cart.');
-    } catch (err) {
-      setMessage(err.message);
+    } catch {
+      // CartContext already surfaces a toast for both success and failure here.
     }
   }
 
@@ -145,8 +142,6 @@ export default function ProductDetail() {
           ) : (
             <p className="out-of-stock">Out of stock</p>
           )}
-          {message && <p className="hint-text">{message}</p>}
-
           <ul className="trust-badges">
             <li>100% A2 Gir Cow Milk</li>
             <li>Chemical-Free &amp; Organic</li>

@@ -1,5 +1,6 @@
 package com.vedikfarm.api.user;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
@@ -74,6 +75,10 @@ public class Address {
     public String getPhone() { return phone; }
     public void setPhone(String phone) { this.phone = phone; }
 
+    // Without this, Jackson's default "isXxx()" boolean-getter convention would serialize this
+    // as JSON field "default" instead of "isDefault", silently breaking every frontend page that
+    // reads address.isDefault (Checkout's auto-select and the Addresses page's default badge).
+    @JsonProperty("isDefault")
     public boolean isDefault() { return isDefault; }
     public void setDefault(boolean aDefault) { isDefault = aDefault; }
 
