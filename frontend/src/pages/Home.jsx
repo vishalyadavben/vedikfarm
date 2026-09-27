@@ -35,7 +35,7 @@ export default function Home() {
               and chemical-free farming.
             </p>
             <div className="hero-actions">
-              <Link to="/shop" className="btn btn-primary">Shop Now</Link>
+              <Link to="/shop" className="btn btn-green">Shop Now</Link>
               <Link to="/about" className="btn btn-secondary">Our Story</Link>
             </div>
           </div>
@@ -79,7 +79,7 @@ export default function Home() {
                 </Link>
                 {p.stockQty > 0 ? (
                   <button
-                    className="btn btn-secondary"
+                    className="btn btn-green"
                     onClick={() => (user ? addToCart(p.id, 1).catch(() => {}) : (window.location.href = '/login'))}
                   >
                     Add to Cart

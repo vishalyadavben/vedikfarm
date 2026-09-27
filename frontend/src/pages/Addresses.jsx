@@ -71,7 +71,7 @@ export default function Addresses() {
       <ul className="address-list">
         {addresses.map((a) => (
           <li key={a.id}>
-            <strong>{a.recipientName}</strong>{a.isDefault ? ' (default)' : ''}<br />
+            <strong>{a.recipientName}</strong>{a.isDefault && <span className="address-default-badge">Default</span>}<br />
             {a.line1}{a.line2 ? `, ${a.line2}` : ''}, {a.city}, {a.state} {a.pincode}<br />
             Phone: {a.phone}
             <div className="address-actions">

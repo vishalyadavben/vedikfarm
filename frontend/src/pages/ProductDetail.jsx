@@ -134,11 +134,14 @@ export default function ProductDetail() {
           <p className="product-description">{product.description}</p>
 
           {product.stockQty > 0 ? (
-            <div className="add-to-cart-row">
-              <input type="number" min="1" max={product.stockQty} value={quantity}
-                     onChange={(e) => setQuantity(Math.max(1, Number(e.target.value)))} />
-              <button className="btn btn-primary" onClick={handleAddToCart}>Add to Cart</button>
-            </div>
+            <>
+              <div className="add-to-cart-row">
+                <input type="number" min="1" max={product.stockQty} value={quantity}
+                       onChange={(e) => setQuantity(Math.max(1, Number(e.target.value)))} />
+                <button className="btn btn-green" onClick={handleAddToCart}>Add to Cart</button>
+              </div>
+              <p className="in-stock-note">&#10003; In Stock{product.stockQty <= 5 ? ` - only ${product.stockQty} left` : ''}</p>
+            </>
           ) : (
             <p className="out-of-stock">Out of stock</p>
           )}

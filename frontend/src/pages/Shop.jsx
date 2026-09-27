@@ -98,7 +98,7 @@ export default function Shop() {
               </Link>
               {p.stockQty > 0 ? (
                 <button
-                  className="btn btn-secondary"
+                  className="btn btn-green"
                   onClick={() => (user ? addToCart(p.id, 1).catch(() => {}) : (window.location.href = '/login'))}
                 >
                   Add to Cart
