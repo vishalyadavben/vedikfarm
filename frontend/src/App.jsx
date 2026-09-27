@@ -1,4 +1,5 @@
 import { Routes, Route } from 'react-router-dom';
+import AnnouncementBar from './components/AnnouncementBar';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import BackToTop from './components/BackToTop';
@@ -25,6 +26,7 @@ import AdminOrders from './pages/admin/AdminOrders';
 export default function App() {
   return (
     <div className="app-shell">
+      <AnnouncementBar />
       <Header />
       <main className="container main-content">
         <Routes>

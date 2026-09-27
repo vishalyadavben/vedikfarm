@@ -90,6 +90,7 @@ export default function Shop() {
           {products.map((p) => (
             <div className="product-card" key={p.id}>
               <Link to={`/products/${p.slug}`}>
+                {p.stockQty > 0 && p.stockQty <= 5 && <span className="low-stock-badge">Only {p.stockQty} left</span>}
                 {p.imageUrl ? <img src={p.imageUrl} alt={p.name} /> : <div className="image-placeholder" />}
                 <h3>{p.name}</h3>
                 <StarRating avg={p.ratingAvg} count={p.ratingCount} />

@@ -2,6 +2,8 @@ package com.vedikfarm.api.catalog;
 
 import com.vedikfarm.api.common.ApiException;
 import com.vedikfarm.api.config.R2Properties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
@@ -22,6 +24,8 @@ import java.util.UUID;
 @Service
 public class ImageStorageService {
 
+    private static final Logger log = LoggerFactory.getLogger(ImageStorageService.class);
+
     private final R2Properties props;
 
     public ImageStorageService(R2Properties props) {
@@ -35,6 +39,15 @@ public class ImageStorageService {
         String contentType = file.getContentType();
         if (contentType == null || !contentType.startsWith("image/")) {
             throw ApiException.badRequest("Only image files are allowed.");
+        }
+        if (isBlank(props.getEndpoint()) || isBlank(props.getAccessKey()) || isBlank(props.getSecretKey())
+                || isBlank(props.getPublicBaseUrl())) {
+            log.error("Cannot upload product image - R2_ENDPOINT/R2_ACCESS_KEY/R2_SECRET_KEY/R2_PUBLIC_BASE_URL "
+                    + "are not fully set in the backend's environment.");
+            throw ApiException.badRequest(
+                    "Image uploads aren't set up yet. Create a Cloudflare R2 bucket and API token, then add "
+                    + "R2_ENDPOINT, R2_ACCESS_KEY, R2_SECRET_KEY, R2_BUCKET and R2_PUBLIC_BASE_URL to the backend "
+                    + ".env and restart the backend.");
         }
 
         String extension = "";
@@ -55,12 +68,17 @@ public class ImageStorageService {
             );
         } catch (IOException e) {
             throw ApiException.badRequest("Could not read the uploaded file.");
+        } catch (RuntimeException e) {
+            log.error("R2 image upload failed: {}", e.getMessage(), e);
+            throw ApiException.badRequest("Could not upload the image to storage. Please try again in a moment.");
         }
 
         String base = props.getPublicBaseUrl();
         if (base != null && base.endsWith("/")) base = base.substring(0, base.length() - 1);
         return base + "/" + key;
     }
+
+    private static boolean isBlank(String s) { return s == null || s.isBlank(); }
 
     private S3Client buildClient() {
         return S3Client.builder()
