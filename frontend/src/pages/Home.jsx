@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import HeroCarousel from '../components/HeroCarousel';
 import client from '../api/client';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
@@ -25,22 +26,7 @@ export default function Home() {
 
   return (
     <div className="home-page">
-      <section className="hero">
-        <div className="container hero-inner">
-          <div>
-            <p className="hero-eyebrow">Milk Beyond Nutrition</p>
-            <h1>Pure A2 Gir Cow Milk &amp; Organic Products</h1>
-            <p className="hero-sub">
-              Direct from the farm to your table - holistic living through indigenous cattle breeds
-              and chemical-free farming.
-            </p>
-            <div className="hero-actions">
-              <Link to="/shop" className="btn btn-green">Shop Now</Link>
-              <Link to="/about" className="btn btn-secondary">Our Story</Link>
-            </div>
-          </div>
-        </div>
-      </section>
+      <HeroCarousel />
 
       <section className="container usp-strip">
         {USPS.map((u) => (
