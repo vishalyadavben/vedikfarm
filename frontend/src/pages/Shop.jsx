@@ -70,9 +70,17 @@ export default function Shop() {
     setSearchParams(next);
   }
 
+  const activeCategory = categories.find((c) => c.slug === category);
+
   return (
     <div>
-      <h1>Shop</h1>
+      <h1>{activeCategory ? activeCategory.name : 'Shop'}</h1>
+
+      {category === 'healthy-combos' && !concern && (
+        <p className="hint-text shop-subtitle">
+          Mix and match our best-selling products - great value when bought together.
+        </p>
+      )}
 
       {concern && (
         <p className="active-concern-note">
