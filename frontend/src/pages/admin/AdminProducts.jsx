@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import client from '../../api/client';
+import AdminNav from '../../components/AdminNav';
 
 export default function AdminProducts() {
   const [products, setProducts] = useState([]);
@@ -19,6 +20,7 @@ export default function AdminProducts() {
 
   return (
     <div>
+      <AdminNav />
       <h1>Products</h1>
       <Link to="/admin/products/new" className="btn btn-primary">Add Product</Link>
       <table className="admin-table">

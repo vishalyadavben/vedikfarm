@@ -45,7 +45,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/**").permitAll()
                 // Reading products/categories/reviews is public; submitting a review needs a login
                 // (falls through to anyRequest().authenticated() below since it's not matched here).
-                .requestMatchers(HttpMethod.GET, "/api/products/**", "/api/categories/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/products/**", "/api/categories/**", "/api/health-concerns/**").permitAll()
                 .requestMatchers("/api/webhooks/**").permitAll()
                 .requestMatchers("/actuator/health").permitAll()
                 // Admin-only

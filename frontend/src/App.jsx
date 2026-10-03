@@ -22,6 +22,8 @@ import NotFound from './pages/NotFound';
 import AdminProducts from './pages/admin/AdminProducts';
 import AdminProductForm from './pages/admin/AdminProductForm';
 import AdminOrders from './pages/admin/AdminOrders';
+import AdminHealthConcerns from './pages/admin/AdminHealthConcerns';
+import AdminHealthConcernForm from './pages/admin/AdminHealthConcernForm';
 
 export default function App() {
   return (
@@ -48,6 +50,9 @@ export default function App() {
           <Route path="/admin/products/new" element={<AdminRoute><AdminProductForm /></AdminRoute>} />
           <Route path="/admin/products/:id/edit" element={<AdminRoute><AdminProductForm /></AdminRoute>} />
           <Route path="/admin/orders" element={<AdminRoute><AdminOrders /></AdminRoute>} />
+          <Route path="/admin/health-concerns" element={<AdminRoute><AdminHealthConcerns /></AdminRoute>} />
+          <Route path="/admin/health-concerns/new" element={<AdminRoute><AdminHealthConcernForm /></AdminRoute>} />
+          <Route path="/admin/health-concerns/:id/edit" element={<AdminRoute><AdminHealthConcernForm /></AdminRoute>} />
 
           <Route path="*" element={<NotFound />} />
         </Routes>

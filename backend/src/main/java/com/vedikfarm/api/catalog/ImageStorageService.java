@@ -18,7 +18,7 @@ import java.net.URI;
 import java.util.UUID;
 
 /**
- * Uploads product images to Cloudflare R2 via its S3-compatible API. R2 has no egress fees,
+ * Uploads images to Cloudflare R2 via its S3-compatible API. R2 has no egress fees,
  * which is why it's used here instead of AWS S3 proper - only the endpoint differs.
  */
 @Service
@@ -32,7 +32,13 @@ public class ImageStorageService {
         this.props = props;
     }
 
+    /** Uploads a product image. Kept as the original signature so existing call sites are unaffected. */
     public String upload(MultipartFile file) {
+        return upload(file, "products");
+    }
+
+    /** Uploads an image under the given folder prefix (e.g. "products", "health-concerns"). */
+    public String upload(MultipartFile file, String folder) {
         if (file.isEmpty()) {
             throw ApiException.badRequest("No file provided.");
         }
@@ -42,7 +48,7 @@ public class ImageStorageService {
         }
         if (isBlank(props.getEndpoint()) || isBlank(props.getAccessKey()) || isBlank(props.getSecretKey())
                 || isBlank(props.getPublicBaseUrl())) {
-            log.error("Cannot upload product image - R2_ENDPOINT/R2_ACCESS_KEY/R2_SECRET_KEY/R2_PUBLIC_BASE_URL "
+            log.error("Cannot upload image - R2_ENDPOINT/R2_ACCESS_KEY/R2_SECRET_KEY/R2_PUBLIC_BASE_URL "
                     + "are not fully set in the backend's environment.");
             throw ApiException.badRequest(
                     "Image uploads aren't set up yet. Create a Cloudflare R2 bucket and API token, then add "
@@ -55,7 +61,7 @@ public class ImageStorageService {
         if (original != null && original.contains(".")) {
             extension = original.substring(original.lastIndexOf('.'));
         }
-        String key = "products/" + UUID.randomUUID() + extension;
+        String key = folder + "/" + UUID.randomUUID() + extension;
 
         try (S3Client s3 = buildClient()) {
             s3.putObject(

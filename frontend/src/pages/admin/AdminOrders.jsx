@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import client from '../../api/client';
+import AdminNav from '../../components/AdminNav';
 
 const STATUSES = ['PENDING_PAYMENT', 'PAID', 'PACKED', 'SHIPPED', 'DELIVERED', 'CANCELLED'];
 
@@ -19,6 +20,7 @@ export default function AdminOrders() {
 
   return (
     <div>
+      <AdminNav />
       <h1>Orders</h1>
       <table className="admin-table">
         <thead>

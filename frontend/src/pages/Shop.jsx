@@ -13,6 +13,7 @@ export default function Shop() {
   const [searchParams, setSearchParams] = useSearchParams();
   const category = searchParams.get('category') || '';
   const search = searchParams.get('search') || '';
+  const concern = searchParams.get('concern') || '';
   const [searchInput, setSearchInput] = useState(search);
   const { addToCart } = useCart();
   const { user } = useAuth();
@@ -32,6 +33,7 @@ export default function Shop() {
       if (searchInput !== search) {
         const next = {};
         if (category) next.category = category;
+        if (concern) next.concern = concern;
         if (searchInput) next.search = searchInput;
         setSearchParams(next);
       }
@@ -44,16 +46,26 @@ export default function Shop() {
     setLoading(true);
     const params = {};
     if (category) params.category = category;
+    if (concern) params.concern = concern;
     if (search) params.search = search;
     client.get('/api/products', { params })
       .then((res) => setProducts(res.data.content))
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
-  }, [category, search]);
+  }, [category, search, concern]);
 
   function selectCategory(slug) {
     const next = {};
     if (slug) next.category = slug;
+    if (search) next.search = search;
+    // Switching category clears a health-concern filter - the two are independent facets
+    // and keeping both after an explicit category click reads as a filter the user didn't ask for.
+    setSearchParams(next);
+  }
+
+  function clearConcern() {
+    const next = {};
+    if (category) next.category = category;
     if (search) next.search = search;
     setSearchParams(next);
   }
@@ -61,6 +73,14 @@ export default function Shop() {
   return (
     <div>
       <h1>Shop</h1>
+
+      {concern && (
+        <p className="active-concern-note">
+          Showing products for <strong>{concern.replace(/-/g, ' ')}</strong>
+          {' '}&middot;{' '}
+          <button type="button" className="link-button" onClick={clearConcern}>Clear filter</button>
+        </p>
+      )}
 
       <div className="shop-toolbar">
         <input

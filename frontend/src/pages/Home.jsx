@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import HeroCarousel from '../components/HeroCarousel';
+import HealthConcernPicker from '../components/HealthConcernPicker';
 import client from '../api/client';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
@@ -27,6 +28,8 @@ export default function Home() {
   return (
     <div className="home-page">
       <HeroCarousel />
+
+      <HealthConcernPicker />
 
       <section className="container usp-strip">
         {USPS.map((u) => (

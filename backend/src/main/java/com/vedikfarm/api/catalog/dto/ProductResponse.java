@@ -21,6 +21,10 @@ public class ProductResponse {
     public int ratingCount;
     // Additional gallery images beyond the primary imageUrl - empty unless the admin added any.
     public List<String> images = List.of();
+    // Health concern tags this product is shown under (e.g. "Sugar Management") - populated
+    // separately by the controller, same pattern as `images` above, since it comes from a
+    // different repository than the Product row itself.
+    public List<Long> healthConcernIds = List.of();
 
     public static ProductResponse from(Product p) {
         ProductResponse r = new ProductResponse();

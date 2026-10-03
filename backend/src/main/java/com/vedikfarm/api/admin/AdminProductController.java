@@ -1,9 +1,12 @@
 package com.vedikfarm.api.admin;
 
 import com.vedikfarm.api.admin.dto.ProductAdminRequest;
+import com.vedikfarm.api.admin.dto.UpdateHealthConcernsRequest;
 import com.vedikfarm.api.admin.dto.UpdateStockRequest;
 import com.vedikfarm.api.catalog.ImageStorageService;
 import com.vedikfarm.api.catalog.Product;
+import com.vedikfarm.api.catalog.ProductHealthConcern;
+import com.vedikfarm.api.catalog.ProductHealthConcernRepository;
 import com.vedikfarm.api.catalog.ProductImage;
 import com.vedikfarm.api.catalog.ProductImageRepository;
 import com.vedikfarm.api.catalog.ProductRepository;
@@ -21,6 +24,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /** Everything here is behind ROLE_ADMIN - see SecurityConfig ("/api/admin/**" -> hasRole("ADMIN")). */
 @RestController
@@ -30,19 +35,34 @@ public class AdminProductController {
     private final ProductRepository productRepository;
     private final ImageStorageService imageStorageService;
     private final ProductImageRepository productImageRepository;
+    private final ProductHealthConcernRepository productHealthConcernRepository;
 
     public AdminProductController(ProductRepository productRepository, ImageStorageService imageStorageService,
-                                   ProductImageRepository productImageRepository) {
+                                   ProductImageRepository productImageRepository,
+                                   ProductHealthConcernRepository productHealthConcernRepository) {
         this.productRepository = productRepository;
         this.imageStorageService = imageStorageService;
         this.productImageRepository = productImageRepository;
+        this.productHealthConcernRepository = productHealthConcernRepository;
     }
 
     @GetMapping
     public ApiResponse<Page<ProductResponse>> list(@RequestParam(defaultValue = "0") int page,
                                                      @RequestParam(defaultValue = "50") int size) {
         var pageable = PageRequest.of(page, Math.min(size, 200), Sort.by("id").descending());
-        return ApiResponse.ok(productRepository.findAll(pageable).map(ProductResponse::from));
+        Page<Product> products = productRepository.findAll(pageable);
+
+        // One query for the whole page's health-concern tags instead of one query per product.
+        List<Long> productIds = products.map(Product::getId).toList();
+        Map<Long, List<Long>> concernIdsByProduct = productHealthConcernRepository.findByProductIdIn(productIds)
+                .stream().collect(Collectors.groupingBy(ProductHealthConcern::getProductId,
+                        Collectors.mapping(ProductHealthConcern::getHealthConcernId, Collectors.toList())));
+
+        return ApiResponse.ok(products.map(p -> {
+            ProductResponse r = ProductResponse.from(p);
+            r.healthConcernIds = concernIdsByProduct.getOrDefault(p.getId(), List.of());
+            return r;
+        }));
     }
 
     @PostMapping
@@ -119,6 +139,29 @@ public class AdminProductController {
         productImageRepository.delete(image);
         return ApiResponse.ok(productImageRepository.findByProductIdOrderBySortOrderAscIdAsc(id)
                 .stream().map(ProductImageResponse::from).toList());
+    }
+
+    /** The health concerns a single product is currently tagged with - used to pre-check the admin form. */
+    @GetMapping("/{id}/health-concerns")
+    public ApiResponse<List<Long>> listHealthConcerns(@PathVariable Long id) {
+        return ApiResponse.ok(productHealthConcernRepository.findByProductId(id)
+                .stream().map(ProductHealthConcern::getHealthConcernId).toList());
+    }
+
+    /** Replaces the full set of health concerns a product is tagged with. */
+    @PutMapping("/{id}/health-concerns")
+    public ApiResponse<List<Long>> updateHealthConcerns(@PathVariable Long id, @RequestBody UpdateHealthConcernsRequest req) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> ApiException.notFound("Product not found"));
+        productHealthConcernRepository.deleteByProductId(product.getId());
+        List<Long> ids = req.getHealthConcernIds() == null ? List.of() : req.getHealthConcernIds();
+        for (Long concernId : ids) {
+            ProductHealthConcern tag = new ProductHealthConcern();
+            tag.setProductId(product.getId());
+            tag.setHealthConcernId(concernId);
+            productHealthConcernRepository.save(tag);
+        }
+        return ApiResponse.ok(ids);
     }
 
     @DeleteMapping("/{id}")

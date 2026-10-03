@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import client from '../../api/client';
+import AdminNav from '../../components/AdminNav';
 
 const emptyForm = { name: '', description: '', price: '', unitLabel: '', stockQty: 0, categoryId: '', gstRate: '0', active: true };
 
@@ -12,12 +13,15 @@ export default function AdminProductForm() {
   const [imageFile, setImageFile] = useState(null);
   const [galleryImages, setGalleryImages] = useState([]);
   const [newGalleryFiles, setNewGalleryFiles] = useState([]);
+  const [healthConcerns, setHealthConcerns] = useState([]);
+  const [selectedConcernIds, setSelectedConcernIds] = useState([]);
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     client.get('/api/categories').then((res) => setCategories(res.data));
+    client.get('/api/admin/health-concerns').then((res) => setHealthConcerns(res.data)).catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -38,6 +42,7 @@ export default function AdminProductForm() {
       }
     });
     loadGallery(id);
+    client.get(`/api/admin/products/${id}/health-concerns`).then((res) => setSelectedConcernIds(res.data)).catch(() => {});
   }, [id, isEdit]);
 
   function loadGallery(productId) {
@@ -46,6 +51,12 @@ export default function AdminProductForm() {
 
   function update(field, value) {
     setForm((f) => ({ ...f, [field]: value }));
+  }
+
+  function toggleConcern(concernId) {
+    setSelectedConcernIds((ids) => (
+      ids.includes(concernId) ? ids.filter((i) => i !== concernId) : [...ids, concernId]
+    ));
   }
 
   async function handleSubmit(e) {
@@ -79,6 +90,8 @@ export default function AdminProductForm() {
         });
       }
 
+      await client.put(`/api/admin/products/${productId}/health-concerns`, { healthConcernIds: selectedConcernIds });
+
       if (!isEdit && newGalleryFiles.length > 0) {
         // Stay on the form after creating so the admin can see/manage the gallery they just uploaded.
         navigate(`/admin/products/${productId}/edit`);
@@ -104,6 +117,7 @@ export default function AdminProductForm() {
 
   return (
     <div>
+      <AdminNav />
       <h1>{isEdit ? 'Edit Product' : 'Add Product'}</h1>
       <form onSubmit={handleSubmit} className="admin-form">
         <label>Name<input value={form.name} onChange={(e) => update('name', e.target.value)} required /></label>
@@ -143,6 +157,24 @@ export default function AdminProductForm() {
               </div>
             ))}
           </div>
+        )}
+
+        {healthConcerns.length > 0 && (
+          <fieldset className="admin-concern-fieldset">
+            <legend>Health Concerns (shown under "Select Health Concern" on the Home page)</legend>
+            <div className="admin-concern-checkboxes">
+              {healthConcerns.map((c) => (
+                <label key={c.id} className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    checked={selectedConcernIds.includes(c.id)}
+                    onChange={() => toggleConcern(c.id)}
+                  />
+                  {' '}{c.name}
+                </label>
+              ))}
+            </div>
+          </fieldset>
         )}
 
         <label className="checkbox-label"><input type="checkbox" checked={form.active} onChange={(e) => update('active', e.target.checked)} /> Active (visible on storefront)</label>
