@@ -44,6 +44,9 @@ a { color: var(--color-primary-dark); }
 .main-nav a:hover { color: var(--color-primary); border-bottom-color: var(--color-primary); }
 .header-actions { margin-left: auto; }
 .header-actions a, .header-actions .link-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
   color: var(--color-text);
   text-decoration: none;
   font-weight: 500;
@@ -54,6 +57,30 @@ a { color: var(--color-primary-dark); }
 .header-actions a:hover, .header-actions .link-button:hover {
   background: var(--color-primary-light);
   color: var(--color-primary-dark);
+}
+.header-icon { flex-shrink: 0; }
+.cart-link { position: relative; }
+.cart-badge {
+  position: absolute;
+  top: 0;
+  right: -2px;
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 3px;
+  line-height: 1;
+}
+
+@media (max-width: 600px) {
+  .header-action-label { display: none; }
+  .header-actions a, .header-actions .link-button { padding: 0.35rem 0.45rem; }
 }
 
 .site-footer {
