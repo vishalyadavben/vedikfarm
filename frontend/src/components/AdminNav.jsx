@@ -8,6 +8,7 @@ export default function AdminNav() {
       <NavLink to="/admin/health-concerns" className={({ isActive }) => (isActive ? 'active' : '')}>Health Concerns</NavLink>
       <NavLink to="/admin/dietician-requests" className={({ isActive }) => (isActive ? 'active' : '')}>Dietician Requests</NavLink>
       <NavLink to="/admin/testimonials" className={({ isActive }) => (isActive ? 'active' : '')}>Testimonials</NavLink>
+      <NavLink to="/admin/sale-banner" className={({ isActive }) => (isActive ? 'active' : '')}>Sale Strip</NavLink>
       <NavLink to="/account/password" className={({ isActive }) => (isActive ? 'active' : '')}>Change Password</NavLink>
     </nav>
   );

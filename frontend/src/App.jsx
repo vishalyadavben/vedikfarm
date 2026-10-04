@@ -1,4 +1,5 @@
 import { Routes, Route } from 'react-router-dom';
+import SaleStrip from './components/SaleStrip';
 import AnnouncementBar from './components/AnnouncementBar';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -34,11 +35,13 @@ import AdminHealthConcernForm from './pages/admin/AdminHealthConcernForm';
 import AdminDieticianRequests from './pages/admin/AdminDieticianRequests';
 import AdminTestimonials from './pages/admin/AdminTestimonials';
 import AdminTestimonialForm from './pages/admin/AdminTestimonialForm';
+import AdminSaleBanner from './pages/admin/AdminSaleBanner';
 
 export default function App() {
   return (
     <div className="app-shell">
       <ScrollToTop />
+      <SaleStrip />
       <AnnouncementBar />
       <Header />
       <main className="container main-content">
@@ -76,6 +79,8 @@ export default function App() {
           <Route path="/admin/testimonials" element={<AdminRoute><AdminTestimonials /></AdminRoute>} />
           <Route path="/admin/testimonials/new" element={<AdminRoute><AdminTestimonialForm /></AdminRoute>} />
           <Route path="/admin/testimonials/:id/edit" element={<AdminRoute><AdminTestimonialForm /></AdminRoute>} />
+
+          <Route path="/admin/sale-banner" element={<AdminRoute><AdminSaleBanner /></AdminRoute>} />
 
           <Route path="*" element={<NotFound />} />
         </Routes>
