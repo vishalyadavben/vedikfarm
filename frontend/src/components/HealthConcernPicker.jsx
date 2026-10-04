@@ -4,6 +4,7 @@ import client from '../api/client';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import StarRating from './StarRating';
+import ConcernIcon from './ConcernIcon';
 
 export default function HealthConcernPicker() {
   const [concerns, setConcerns] = useState([]);
@@ -56,7 +57,7 @@ export default function HealthConcernPicker() {
               {c.imageUrl ? (
                 <img src={c.imageUrl} alt="" className="concern-pill-avatar" />
               ) : (
-                <span className="concern-pill-avatar concern-pill-avatar-fallback">{c.name.charAt(0)}</span>
+                <span className="concern-pill-avatar concern-pill-avatar-icon"><ConcernIcon slug={c.slug} /></span>
               )}
               <span>{c.name}</span>
             </button>
