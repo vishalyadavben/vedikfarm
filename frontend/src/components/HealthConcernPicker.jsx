@@ -14,16 +14,15 @@ export default function HealthConcernPicker() {
   const { user } = useAuth();
 
   useEffect(() => {
-    client.get('/api/health-concerns').then((res) => {
-      setConcerns(res.data);
-      if (res.data.length > 0) setSelected(res.data[0].slug);
-    }).catch(() => {});
+    client.get('/api/health-concerns').then((res) => setConcerns(res.data)).catch(() => {});
   }, []);
 
+  // selected === null -> default view: a mix of all products. Picking a concern filters to it.
   useEffect(() => {
-    if (!selected) return;
     setLoadingProducts(true);
-    client.get('/api/products', { params: { concern: selected, size: 8 } })
+    const params = { size: 8 };
+    if (selected) params.concern = selected;
+    client.get('/api/products', { params })
       .then((res) => setProducts(res.data.content))
       .catch(() => setProducts([]))
       .finally(() => setLoadingProducts(false));
@@ -51,7 +50,7 @@ export default function HealthConcernPicker() {
               role="tab"
               aria-selected={isActive}
               className={`concern-pill${isActive ? ' is-active' : ''}`}
-              onClick={() => setSelected(c.slug)}
+              onClick={() => setSelected(isActive ? null : c.slug)}
             >
               {isActive && <span className="concern-pill-check">&#10003;</span>}
               {c.imageUrl ? (
@@ -65,11 +64,11 @@ export default function HealthConcernPicker() {
         })}
       </div>
 
-      {activeConcern && (
+      {(
         <div className="concern-results">
           <div className="concern-results-header">
-            <h3 className="section-heading">{activeConcern.name}</h3>
-            <Link to={`/shop?concern=${activeConcern.slug}`} className="concern-view-all">
+            <h3 className="section-heading">{activeConcern ? activeConcern.name : 'Our Products'}</h3>
+            <Link to={activeConcern ? `/shop?concern=${activeConcern.slug}` : '/shop'} className="concern-view-all">
               View all
             </Link>
           </div>
@@ -77,7 +76,9 @@ export default function HealthConcernPicker() {
           {loadingProducts ? (
             <p>Loading products...</p>
           ) : products.length === 0 ? (
-            <p className="hint-text">We're still adding products for this concern - check back soon.</p>
+            <p className="hint-text">
+              {activeConcern ? "We're still adding products for this concern - check back soon." : 'No products available right now.'}
+            </p>
           ) : (
             <div className="product-grid">
               {products.map((p) => (

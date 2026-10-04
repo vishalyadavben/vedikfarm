@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import client from '../api/client';
+import Testimonials from '../components/Testimonials';
 
 const FAQS = [
   {
@@ -82,20 +83,7 @@ export default function About() {
         </section>
       )}
 
-      <section className="about-testimonials">
-        <h2 className="section-heading">What Our Customers Say</h2>
-        <p className="hint-text testimonial-note">
-          Real customer reviews go here before launch - replace these placeholders with actual quotes.
-        </p>
-        <div className="testimonial-grid">
-          {[1, 2].map((i) => (
-            <div className="testimonial-card placeholder-card" key={i}>
-              <p>&ldquo;[Add a real customer quote here before launch]&rdquo;</p>
-              <p className="testimonial-name">- Customer name</p>
-            </div>
-          ))}
-        </div>
-      </section>
+      <Testimonials className="about-testimonials" />
 
       <section className="about-faq">
         <h2 className="section-heading">Frequently Asked Questions</h2>

@@ -271,12 +271,55 @@ a { color: var(--color-primary-dark); }
 .section-heading { font-size: 1.5rem; margin: 0 0 1.25rem; }
 .section-cta { text-align: center; margin-top: 1.5rem; }
 
-.testimonials, .about-testimonials { }
-.testimonial-note { margin-top: -0.5rem; margin-bottom: 1.25rem; }
-.testimonial-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.25rem; }
-.testimonial-card { background: #fff; border: 1px dashed var(--color-border); border-radius: 10px; padding: 1.25rem; }
-.testimonial-card.placeholder-card { color: #888; font-style: italic; }
-.testimonial-name { margin-top: 0.75rem; font-style: normal; font-weight: 600; color: #555; }
+.testimonials-section { margin-top: 0.5rem; }
+.testimonials-heading { text-align: center; font-size: 1.9rem; margin: 0 0 1.75rem; color: var(--color-text); }
+.testimonial-track {
+  display: flex; gap: 1.25rem; overflow-x: auto; scroll-snap-type: x mandatory;
+  padding: 0.5rem 0.25rem 1rem; scrollbar-width: none; -webkit-overflow-scrolling: touch;
+}
+.testimonial-track::-webkit-scrollbar { display: none; }
+.testimonial-card {
+  flex: 0 0 calc((100% - 2.5rem) / 3); scroll-snap-align: start; margin: 0;
+  display: flex; flex-direction: column; justify-content: space-between; gap: 1.5rem;
+  min-height: 250px; padding: 1.75rem 1.5rem 1.4rem; background: #fff;
+  border: 1px solid var(--color-border); border-radius: 20px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05); transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+.testimonial-card:hover { box-shadow: 0 10px 24px rgba(0, 0, 0, 0.09); transform: translateY(-3px); }
+.testimonial-card blockquote { margin: 0; color: #444; font-size: 0.95rem; line-height: 1.7; letter-spacing: 0.01em; }
+.testimonial-author { display: flex; align-items: center; gap: 1rem; }
+.testimonial-avatar {
+  flex-shrink: 0; width: 64px; height: 64px; border-radius: 50%; object-fit: cover;
+  border: 3px solid var(--color-accent-green-light); background: var(--color-primary-light);
+}
+.testimonial-avatar-fallback {
+  display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 700;
+  color: var(--color-accent-green-dark); text-transform: uppercase;
+}
+.testimonial-author-text { display: flex; flex-direction: column; gap: 0.15rem; min-width: 0; }
+.testimonial-name { font-weight: 700; font-size: 1.02rem; color: var(--color-accent-green-dark); }
+.testimonial-city { font-size: 0.82rem; color: #777; }
+.testimonial-stars { color: #d9d6cc; letter-spacing: 0.1em; font-size: 1.05rem; }
+.testimonial-stars .is-filled { color: #f5b301; }
+.testimonial-controls { display: flex; align-items: center; justify-content: center; gap: 1rem; margin-top: 0.5rem; }
+.testimonial-arrow {
+  width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--color-accent-green); background: #fff;
+  color: var(--color-accent-green); font-size: 1.6rem; line-height: 1; cursor: pointer; padding: 0 0 3px;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.testimonial-arrow:hover { background: var(--color-accent-green); color: #fff; }
+.testimonial-dots { display: flex; gap: 0.5rem; align-items: center; }
+.testimonial-dot { width: 10px; height: 10px; border-radius: 50%; border: none; padding: 0; background: #d3d1c8; cursor: pointer; }
+.testimonial-dot.is-active { background: var(--color-accent-green); transform: scale(1.2); }
+.testimonial-order { white-space: nowrap; }
+.admin-testimonial-thumb { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; display: block; }
+@media (max-width: 900px) {
+  .testimonial-card { flex-basis: calc((100% - 1.25rem) / 2); }
+}
+@media (max-width: 600px) {
+  .testimonials-heading { font-size: 1.5rem; }
+  .testimonial-card { flex-basis: 88%; min-height: 0; }
+}
 
 .shop-toolbar { display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.5rem; }
 .shop-subtitle { font-size: 1rem; margin: -0.75rem 0 1.25rem; }
@@ -672,3 +715,30 @@ a { color: var(--color-primary-dark); }
 @media (max-width: 480px) {
   .toast-stack { left: 1rem; right: 1rem; max-width: none; }
 }
+
+/* ---- My Dietician Plan ---- */
+.dietician-page { max-width: 560px; }
+.dietician-offer {
+  display: flex; align-items: center; gap: 0.75rem;
+  background: var(--color-accent-green-light); border: 1px solid var(--color-accent-green);
+  border-radius: 999px; padding: 0.4rem 1.1rem 0.4rem 0.45rem; margin-bottom: 1.25rem; width: fit-content; max-width: 100%;
+}
+.dietician-offer p { margin: 0; font-weight: 600; font-size: 0.95rem; color: var(--color-accent-green-dark); }
+.dietician-offer-tag {
+  background: var(--color-accent-green); color: #fff; font-size: 0.72rem; font-weight: 700;
+  letter-spacing: 0.06em; padding: 0.25rem 0.65rem; border-radius: 999px;
+}
+.dietician-intro { color: #555; margin: -0.5rem 0 1.5rem; }
+.dietician-form { display: flex; flex-direction: column; gap: 1rem; }
+.dietician-form label { display: flex; flex-direction: column; gap: 0.3rem; font-size: 0.9rem; }
+.dietician-form input, .dietician-form textarea {
+  padding: 0.6rem 0.8rem; border: 1px solid var(--color-border); border-radius: 8px; font: inherit; background: #fff;
+}
+.dietician-form input[readonly] { background: #f3f1ea; color: #666; }
+.dietician-login-prompt, .dietician-summary {
+  background: #fff; border: 1px solid var(--color-border); border-radius: 10px; padding: 1.25rem;
+}
+.dietician-success { color: var(--color-accent-green-dark); font-weight: 600; margin-top: 0; }
+.dietician-summary dl { display: grid; grid-template-columns: max-content 1fr; gap: 0.4rem 1rem; margin: 1rem 0 1.25rem; }
+.dietician-summary dt { color: #777; }
+.dietician-summary dd { margin: 0; }

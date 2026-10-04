@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import HeroCarousel from '../components/HeroCarousel';
 import HealthConcernPicker from '../components/HealthConcernPicker';
+import Testimonials from '../components/Testimonials';
 import client from '../api/client';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
@@ -86,20 +87,7 @@ export default function Home() {
         </section>
       )}
 
-      <section className="container testimonials">
-        <h2 className="section-heading">What Our Customers Say</h2>
-        <p className="hint-text testimonial-note">
-          Real customer reviews go here before launch - replace these placeholders with actual quotes.
-        </p>
-        <div className="testimonial-grid">
-          {[1, 2, 3].map((i) => (
-            <div className="testimonial-card placeholder-card" key={i}>
-              <p>&ldquo;[Add a real customer quote here before launch]&rdquo;</p>
-              <p className="testimonial-name">- Customer name</p>
-            </div>
-          ))}
-        </div>
-      </section>
+      <Testimonials className="container testimonials" />
     </div>
   );
 }

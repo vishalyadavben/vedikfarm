@@ -17,6 +17,14 @@ client.interceptors.request.use((config) => {
 client.interceptors.response.use(
   (response) => response.data,
   (error) => {
+    const url = error.config?.url || '';
+    const hadToken = Boolean(localStorage.getItem('vf_token'));
+    // 401 = the login is missing/expired (access tokens last 60 min). /api/auth/* calls handle their
+    // own errors (wrong password, AuthContext's /me check), so they're left alone.
+    if (error.response?.status === 401 && hadToken && !url.startsWith('/api/auth/')) {
+      localStorage.removeItem('vf_token');
+      window.location.href = '/login?expired=1';
+    }
     const message = error.response?.data?.message || error.message || 'Something went wrong.';
     return Promise.reject(new Error(message));
   }

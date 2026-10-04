@@ -18,12 +18,16 @@ import About from './pages/About';
 import Contact from './pages/Contact';
 import Addresses from './pages/Addresses';
 import NotFound from './pages/NotFound';
+import DieticianPlan from './pages/DieticianPlan';
 
 import AdminProducts from './pages/admin/AdminProducts';
 import AdminProductForm from './pages/admin/AdminProductForm';
 import AdminOrders from './pages/admin/AdminOrders';
 import AdminHealthConcerns from './pages/admin/AdminHealthConcerns';
 import AdminHealthConcernForm from './pages/admin/AdminHealthConcernForm';
+import AdminDieticianRequests from './pages/admin/AdminDieticianRequests';
+import AdminTestimonials from './pages/admin/AdminTestimonials';
+import AdminTestimonialForm from './pages/admin/AdminTestimonialForm';
 
 export default function App() {
   return (
@@ -40,6 +44,7 @@ export default function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/cart" element={<Cart />} />
+          <Route path="/dietician-plan" element={<DieticianPlan />} />
 
           <Route path="/addresses" element={<ProtectedRoute><Addresses /></ProtectedRoute>} />
           <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
@@ -53,6 +58,12 @@ export default function App() {
           <Route path="/admin/health-concerns" element={<AdminRoute><AdminHealthConcerns /></AdminRoute>} />
           <Route path="/admin/health-concerns/new" element={<AdminRoute><AdminHealthConcernForm /></AdminRoute>} />
           <Route path="/admin/health-concerns/:id/edit" element={<AdminRoute><AdminHealthConcernForm /></AdminRoute>} />
+
+          <Route path="/admin/dietician-requests" element={<AdminRoute><AdminDieticianRequests /></AdminRoute>} />
+
+          <Route path="/admin/testimonials" element={<AdminRoute><AdminTestimonials /></AdminRoute>} />
+          <Route path="/admin/testimonials/new" element={<AdminRoute><AdminTestimonialForm /></AdminRoute>} />
+          <Route path="/admin/testimonials/:id/edit" element={<AdminRoute><AdminTestimonialForm /></AdminRoute>} />
 
           <Route path="*" element={<NotFound />} />
         </Routes>

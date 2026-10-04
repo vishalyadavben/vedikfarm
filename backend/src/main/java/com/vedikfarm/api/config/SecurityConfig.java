@@ -40,12 +40,20 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable()) // stateless JWT API, no cookies/CSRF surface
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .exceptionHandling(ex -> ex.authenticationEntryPoint((request, response, authException) -> {
+                // No valid login (missing or expired token) -> 401. A logged-in user who lacks the
+                // ADMIN role still gets 403 from Spring's default access-denied handling.
+                response.setStatus(401);
+                response.setContentType("application/json");
+                response.getWriter().write(
+                        "{\"success\":false,\"message\":\"Your session has expired. Please log in again.\",\"data\":null}");
+            }))
             .authorizeHttpRequests(auth -> auth
                 // Public: browsing the catalog, auth, and the payment webhook (verified by signature, not a session)
                 .requestMatchers("/api/auth/**").permitAll()
                 // Reading products/categories/reviews is public; submitting a review needs a login
                 // (falls through to anyRequest().authenticated() below since it's not matched here).
-                .requestMatchers(HttpMethod.GET, "/api/products/**", "/api/categories/**", "/api/health-concerns/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/products/**", "/api/categories/**", "/api/health-concerns/**", "/api/testimonials/**").permitAll()
                 .requestMatchers("/api/webhooks/**").permitAll()
                 .requestMatchers("/actuator/health").permitAll()
                 // Admin-only

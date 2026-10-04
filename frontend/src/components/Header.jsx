@@ -37,6 +37,7 @@ export default function Header() {
         <nav className="main-nav">
           <Link to="/shop">Shop</Link>
           <Link to="/shop?category=healthy-combos">Combos</Link>
+          <Link to="/dietician-plan">My Dietician Plan</Link>
           <Link to="/about">About</Link>
           <Link to="/contact">Contact</Link>
           {isAdmin && <Link to="/admin/products">Admin</Link>}
