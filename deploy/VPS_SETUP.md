@@ -44,7 +44,7 @@ nano .env   # fill in every value - see the comments in the file for where each 
 docker compose up -d --build
 ```
 
-Check it's up: `curl http://localhost:8080/actuator/health` should return `{"status":"UP"}`.
+Check it's up: `curl http://localhost:8090/actuator/health` should return `{"status":"UP"}`.
 
 ## 5. Configure Caddy
 

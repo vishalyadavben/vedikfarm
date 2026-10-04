@@ -3,6 +3,7 @@ import AnnouncementBar from './components/AnnouncementBar';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import BackToTop from './components/BackToTop';
+import ScrollToTop from './components/ScrollToTop';
 import { ProtectedRoute, AdminRoute } from './components/ProtectedRoute';
 
 import Home from './pages/Home';
@@ -19,6 +20,11 @@ import Contact from './pages/Contact';
 import Addresses from './pages/Addresses';
 import NotFound from './pages/NotFound';
 import DieticianPlan from './pages/DieticianPlan';
+import ChangePassword from './pages/ChangePassword';
+import PrivacyPolicy from './pages/policies/PrivacyPolicy';
+import TermsAndConditions from './pages/policies/TermsAndConditions';
+import ShippingPolicy from './pages/policies/ShippingPolicy';
+import RefundPolicy from './pages/policies/RefundPolicy';
 
 import AdminProducts from './pages/admin/AdminProducts';
 import AdminProductForm from './pages/admin/AdminProductForm';
@@ -32,6 +38,7 @@ import AdminTestimonialForm from './pages/admin/AdminTestimonialForm';
 export default function App() {
   return (
     <div className="app-shell">
+      <ScrollToTop />
       <AnnouncementBar />
       <Header />
       <main className="container main-content">
@@ -45,7 +52,12 @@ export default function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/dietician-plan" element={<DieticianPlan />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
+          <Route path="/shipping-policy" element={<ShippingPolicy />} />
+          <Route path="/refund-policy" element={<RefundPolicy />} />
 
+          <Route path="/account/password" element={<ProtectedRoute><ChangePassword /></ProtectedRoute>} />
           <Route path="/addresses" element={<ProtectedRoute><Addresses /></ProtectedRoute>} />
           <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
           <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />

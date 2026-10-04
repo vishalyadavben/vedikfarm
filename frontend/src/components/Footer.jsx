@@ -20,6 +20,13 @@ export default function Footer() {
               <li><Link to="/contact">Contact</Link></li>
               <li><Link to="/orders">My Orders</Link></li>
             </ul>
+            <h4 className="footer-subheading">Policies</h4>
+            <ul className="footer-links">
+              <li><Link to="/privacy-policy">Privacy Policy</Link></li>
+              <li><Link to="/terms-and-conditions">Terms &amp; Conditions</Link></li>
+              <li><Link to="/shipping-policy">Shipping Policy</Link></li>
+              <li><Link to="/refund-policy">Cancellation &amp; Refund Policy</Link></li>
+            </ul>
           </div>
 
           <div className="footer-col">

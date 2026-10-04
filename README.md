@@ -7,6 +7,10 @@ A2 Gir cow milk products and organic goods - e-commerce site, rebuilt from scrat
 - `docker-compose.yml` - runs backend + MySQL together (local dev and production VPS)
 - `deploy/` - Caddy reverse-proxy config and VPS setup instructions
 
+## License
+
+Proprietary - all rights reserved. See `LICENSE`.
+
 ## Local development
 
 **Backend + database:**
@@ -17,8 +21,9 @@ cp backend/.env.example .env
 docker compose up -d --build
 ```
 Runs the API at `http://localhost:8090`. Flyway applies the schema and seeds the real
-product catalog and a bootstrap admin account (`admin@vedikfarm.in` / `ChangeMe123!` -
-change this password immediately, see the comment in `V3__seed_admin_user.sql`).
+product catalog and a bootstrap admin account (`admin@vedikfarm.in`). Its starting password
+is in `V3__seed_admin_user.sql` - log in and change it immediately via Admin > Change Password
+(`/account/password`) before the site is ever reachable from the internet.
 
 **Frontend:**
 ```bash

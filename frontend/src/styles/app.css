@@ -746,3 +746,10 @@ a { color: var(--color-primary-dark); }
 .dietician-summary dl { display: grid; grid-template-columns: max-content 1fr; gap: 0.4rem 1rem; margin: 1rem 0 1.25rem; }
 .dietician-summary dt { color: #777; }
 .dietician-summary dd { margin: 0; }
+
+/* ---- Policy pages ---- */
+.policy-page { max-width: 760px; }
+.policy-page h2 { font-size: 1.15rem; margin: 1.75rem 0 0.5rem; color: var(--color-accent-green-dark); }
+.policy-page p, .policy-page li { line-height: 1.7; color: #3a3a3a; }
+.policy-page ul { padding-left: 1.25rem; margin: 0.5rem 0; }
+.footer-subheading { margin-top: 1.25rem !important; }

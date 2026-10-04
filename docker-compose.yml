@@ -14,7 +14,9 @@ services:
       # MySQL container. This only affects connecting a DB client from your own
       # machine; the backend container always talks to mysql:3306 internally over
       # the Docker network, unaffected by this mapping.
-      - "3309:3306"
+      # Bound to 127.0.0.1 so the database is NOT reachable from the internet on a live server;
+      # a DB client on the same machine (or over an SSH tunnel) can still connect.
+      - "127.0.0.1:3309:3306"
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-change_me}"]
       interval: 5s
@@ -57,7 +59,9 @@ services:
       # Host port 8090, not 8080 - your other project's backend already uses 8080
       # on your machine. Container-internal port stays 8080 (see Dockerfile/EXPOSE);
       # this only changes what you type in your browser/frontend .env to reach it.
-      - "8090:8080"
+      # Bound to 127.0.0.1: only Caddy on the same machine (deploy/Caddyfile) can reach the API directly;
+      # the public goes through https://api.vedikfarm.in. Local dev (localhost:8090) still works.
+      - "127.0.0.1:8090:8080"
 
 volumes:
   mysql_data:
