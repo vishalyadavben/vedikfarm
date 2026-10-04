@@ -7,6 +7,7 @@ import client from '../api/client';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import StarRating from '../components/StarRating';
+import Sprig from '../components/Sprig';
 
 const USPS = [
   { title: '100% A2 Gir Cow Milk', text: 'Sourced from indigenous Gir cows, never crossbred, never rushed.' },
@@ -55,7 +56,8 @@ export default function Home() {
       </section>
 
       {featured.length > 0 && (
-        <section className="container">
+        <section className="container sprig-host">
+          <Sprig name="mango" side="right" />
           <h2 className="section-heading">Popular Picks</h2>
           <div className="product-grid">
             {featured.map((p) => (

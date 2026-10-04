@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import Sprig from '../components/Sprig';
 import { Link } from 'react-router-dom';
 import client from '../api/client';
 import Testimonials from '../components/Testimonials';
@@ -48,7 +49,8 @@ export default function About() {
         </p>
       </section>
 
-      <section className="about-mission">
+      <section className="about-mission sprig-host">
+        <Sprig name="wheat" side="right" />
         <h2 className="section-heading">Our Mission</h2>
         <p>
           We work with indigenous Gir cows rather than crossbred or industrially farmed cattle,
@@ -70,7 +72,8 @@ export default function About() {
       )}
 
       {categories.length > 0 && (
-        <section className="about-showcase">
+        <section className="about-showcase sprig-host">
+          <Sprig name="mango" side="right" />
           <h2 className="section-heading">What We Offer</h2>
           <div className="showcase-grid">
             {categories.map((c) => (

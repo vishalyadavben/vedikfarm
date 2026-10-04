@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import Sprig from './Sprig';
 import { Link } from 'react-router-dom';
 import client from '../api/client';
 import { useCart } from '../context/CartContext';
@@ -34,7 +35,8 @@ export default function HealthConcernPicker() {
   const activeConcern = concerns.find((c) => c.slug === selected);
 
   return (
-    <section className="concern-picker">
+    <section className="concern-picker sprig-host">
+      <Sprig name="wheat" side="right" />
       <div className="concern-picker-inner">
       <div className="concern-picker-header">
         <span className="concern-picker-icon" aria-hidden="true">&#9881;</span>

@@ -784,3 +784,26 @@ a { color: var(--color-primary-dark); }
 .sale-status { padding: 0.5rem 0.75rem; border-radius: 6px; background: #f3f1ea; display: inline-block; }
 .sale-status-live { background: var(--color-accent-green-light); color: var(--color-accent-green-dark); }
 .success-text { color: var(--color-accent-green-dark); font-weight: 600; }
+
+/* ---- Decorative watercolour sprigs tucked into section edges (components/Sprig.jsx) ---- */
+.sprig-host { position: relative; }
+/* Real content always sits above the illustrations. */
+.sprig-host > :not(.sprig) { position: relative; z-index: 1; }
+.sprig { display: none; position: absolute; z-index: 0; height: auto; max-width: none; pointer-events: none; user-select: none; }
+/* Only shown where the page margins are wide enough to hold them without touching the content. */
+@media (min-width: 1150px) {
+  .sprig {
+    display: block;
+    /* Room between the 1100px content column and the browser edge, plus a little tuck-in. */
+    --sprig-room: calc((100vw - 1100px) / 2 + 2.5rem);
+  }
+  .sprig-right { right: calc(50% - 50vw); }
+  .sprig-left { left: calc(50% - 50vw); transform: scaleX(-1); }
+
+    /* Sizes are capped by the section's own height (object-fit keeps the proportions) so an illustration never spills into the next section. */
+  .sprig { object-fit: contain; object-position: right top; }
+  .sprig-wheat { width: clamp(110px, var(--sprig-room), 190px); top: 0.75rem; max-height: calc(100% - 1.5rem); }
+  .sprig-mango { width: clamp(110px, var(--sprig-room), 230px); top: -1.5rem; max-height: calc(100% + 1rem); }
+  .sprig-rice  { width: clamp(110px, var(--sprig-room), 210px); top: -0.5rem; max-height: calc(100% + 0.5rem); }
+  .sprig-grass { width: clamp(100px, var(--sprig-room), 190px); bottom: 0; max-height: 100%; object-position: right bottom; }
+}

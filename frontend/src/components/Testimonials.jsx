@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import Sprig from './Sprig';
 import client from '../api/client';
 
 function Stars({ rating }) {
@@ -66,7 +67,9 @@ export default function Testimonials({ className = '' }) {
   if (items.length === 0) return null;
 
   return (
-    <section className={`testimonials-section ${className}`}>
+    <section className={`testimonials-section sprig-host ${className}`}>
+      <Sprig name="rice" side="left" />
+      <Sprig name="grass" side="right" />
       <h2 className="testimonials-heading">What Do Our Customers Say</h2>
 
       <div className="testimonial-track" ref={trackRef} onScroll={update}>
