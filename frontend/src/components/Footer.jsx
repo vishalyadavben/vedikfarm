@@ -33,12 +33,12 @@ export default function Footer() {
           <div className="footer-col">
             <h4>Get in Touch</h4>
             <address>
-              Shop No. Ground Floor, Next to Ram Mandir,<br />
-              Ramdev Park, Mira Road - 401107,<br />
-              Mumbai, Maharashtra, India
+              Shop no. 4, Ramsagar chs Ltd, Ramdev Park,<br />
+              Mira Road(East) - 401105,<br />
+              Mira Bhayandar, Maharashtra, India
             </address>
-            <p><a href="tel:+917977104965">+91 79771 04965</a></p>
-            <p><a href="mailto:sachinsan07@gmail.com">sachinsan07@gmail.com</a></p>
+            <p><a href="tel:+918419930505">+91 84199 30505</a></p>
+            <p><a href="mailto:Thevedikfarms@gmail.com">Thevedikfarms@gmail.com</a></p>
           </div>
         </div>
       </div>

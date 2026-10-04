@@ -2,9 +2,9 @@ export default function Contact() {
   return (
     <div>
       <h1>Contact Us</h1>
-      <p>Phone: +91 79771 04965</p>
-      <p>Email: sachinsan07@gmail.com</p>
-      <p>Address: Shop No. Ground Floor, Next to Ram Mandir, Ramdev Park, Mira Road - 401107, Mumbai, Maharashtra, India</p>
+      <p>Phone: +91 84199 30505</p>
+      <p>Email: Thevedikfarms@gmail.com</p>
+      <p>Address: Shop no. 4, Ramsagar chs Ltd, Ramdev Park, Mira Road(East) - 401105, Mira Bhayandar, Maharashtra, India.</p>
     </div>
   );
 }
