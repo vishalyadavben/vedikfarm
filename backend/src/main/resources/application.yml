@@ -9,6 +9,11 @@ management:
   endpoint:
     health:
       show-details: never
+  health:
+    mail:
+      # Spring would otherwise try to log in to the SMTP server on every health check, so a missing or wrong
+      # email password made the whole API report "DOWN" even though shopping and orders were fine.
+      enabled: false
 
 spring:
   application:
