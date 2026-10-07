@@ -4,6 +4,7 @@ import AnnouncementBar from './components/AnnouncementBar';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import BackToTop from './components/BackToTop';
+import InstallPrompt from './components/InstallPrompt';
 import ScrollToTop from './components/ScrollToTop';
 import { ProtectedRoute, AdminRoute } from './components/ProtectedRoute';
 
@@ -87,6 +88,7 @@ export default function App() {
       </main>
       <Footer />
       <BackToTop />
+      <InstallPrompt />
     </div>
   );
 }

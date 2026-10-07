@@ -20,3 +20,11 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     </BrowserRouter>
   </React.StrictMode>
 );
+
+// Makes the site installable as an app and shows an offline page with no connection (see public/sw.js).
+// Production only, so local development never serves stale files from a service worker.
+if (import.meta.env.PROD && 'serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => { /* not installable here - the site works normally */ });
+  });
+}
